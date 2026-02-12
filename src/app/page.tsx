@@ -1,45 +1,77 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { format, isBefore, startOfToday, isSaturday, isSunday, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { initialSeats } from "@/lib/data";
 import type { Seat as SeatType } from "@/lib/data";
 import { SeatLayout } from "@/components/seat-layout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2 } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CheckCircle2, CalendarIcon } from "lucide-react";
 
 export default function Home() {
   const [seats, setSeats] = useState<SeatType[]>(initialSeats);
-  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+
+  const selectedSeat = useMemo(() => seats.find(s => s.status === 'selected'), [seats]);
+  const reservedSeat = useMemo(() => seats.find(s => s.status === 'unavailable' && s.id !== '2F'), [seats]);
 
   const handleSeatClick = (id: string) => {
-    setSeats(prevSeats =>
-      prevSeats.map(seat => {
-        if (seat.id === id) {
-          if (seat.status === "available") {
-            return { ...seat, status: "selected" };
-          } else if (seat.status === "selected") {
-            return { ...seat, status: "available" };
+    if (reservedSeat) return; // Cannot change selection if a seat is already reserved
+
+    setSeats((currentSeats) => {
+      const seatToClick = currentSeats.find((s) => s.id === id);
+      if (!seatToClick || (seatToClick.status === 'unavailable' && seatToClick.id !== '2F')) {
+          return currentSeats;
+      }
+
+      const isAlreadySelected = seatToClick.status === 'selected';
+      setSelectedDate(undefined); // Reset date on any seat click action
+
+      if (isAlreadySelected) {
+          return currentSeats.map((s) =>
+              s.id === id ? { ...s, status: 'available' } : s
+          );
+      }
+
+      return currentSeats.map((s) => {
+          if (s.id === id) {
+              return { ...s, status: 'selected' };
           }
-        }
-        return seat;
-      })
-    );
-    setConfirmationMessage(null);
+          if (s.status === 'selected') {
+              return { ...s, status: 'available' };
+          }
+          return s;
+      });
+    });
   };
 
-  const selectedSeats = useMemo(() => seats.filter(s => s.status === 'selected'), [seats]);
-
   const handleReservation = () => {
-    if (selectedSeats.length === 0) return;
+    if (!selectedSeat || !selectedDate) return;
 
     setSeats(prevSeats =>
       prevSeats.map(seat =>
-        seat.status === "selected" ? { ...seat, status: "unavailable" } : seat
+        seat.id === selectedSeat.id
+          ? { ...seat, status: "unavailable", reservationDate: selectedDate }
+          : seat
       )
     );
-    setConfirmationMessage(`You have successfully reserved ${selectedSeats.length} seat(s): ${selectedSeats.map(s => s.id).join(', ')}.`);
+    setSelectedDate(undefined);
+  };
+
+  const handleCancelReservation = () => {
+    if (!reservedSeat) return;
+
+    setSeats(prevSeats =>
+      prevSeats.map(seat =>
+        seat.id === reservedSeat.id
+          ? { ...seat, status: "available", reservationDate: undefined }
+          : seat
+      )
+    );
   };
 
   const Legend = () => (
@@ -58,13 +90,25 @@ export default function Home() {
       </div>
     </div>
   );
+  
+  const nextEightWeekdays = useMemo(() => {
+    const dates: Date[] = [];
+    let currentDate = startOfToday();
+    while (dates.length < 8) {
+      if (!isSaturday(currentDate) && !isSunday(currentDate)) {
+        dates.push(currentDate);
+      }
+      currentDate = addDays(currentDate, 1);
+    }
+    return dates;
+  }, []);
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 md:p-8">
       <Card className="w-full max-w-3xl shadow-lg animate-in fade-in-50 duration-500">
         <CardHeader className="text-center">
           <CardTitle className="text-4xl font-bold text-primary font-headline tracking-tight">Seatly</CardTitle>
-          <CardDescription className="text-lg">Select your seats for the trip</CardDescription>
+          <CardDescription className="text-lg">Select your seat for the trip</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="bg-muted/30 rounded-lg p-2 sm:p-4">
@@ -73,29 +117,69 @@ export default function Home() {
           
           <Legend />
           
-          {confirmationMessage && (
+          {reservedSeat && reservedSeat.reservationDate && (
             <Alert className="mt-6 bg-primary/10 border-primary/20 animate-in fade-in-0 zoom-in-95">
               <CheckCircle2 className="h-4 w-4 text-primary" />
               <AlertTitle className="text-primary font-semibold">Reservation Confirmed!</AlertTitle>
               <AlertDescription className="text-primary/80">
-                {confirmationMessage}
+                You have successfully reserved seat {reservedSeat.id} for {format(reservedSeat.reservationDate, "PPP")}.
               </AlertDescription>
             </Alert>
           )}
 
         </CardContent>
-        <CardFooter className="flex-col sm:flex-row gap-4 pt-6 bg-muted/50 dark:bg-muted/20 rounded-b-lg p-6">
+        <CardFooter className="flex-col sm:flex-row justify-between items-center gap-4 pt-6 bg-muted/50 dark:bg-muted/20 rounded-b-lg p-6">
           <div className="flex-1 text-center sm:text-left">
-            <p className="text-lg font-semibold">{selectedSeats.length} {selectedSeats.length === 1 ? 'Seat' : 'Seats'} Selected</p>
+             {reservedSeat ? (
+              <p className="text-lg font-semibold">Seat {reservedSeat.id} Reserved</p>
+            ) : selectedSeat ? (
+              <p className="text-lg font-semibold">Seat {selectedSeat.id} Selected</p>
+            ) : (
+              <p className="text-lg font-semibold">Select a seat</p>
+            )}
           </div>
-          <Button 
-            size="lg" 
-            className="w-full sm:w-auto text-lg py-7"
-            onClick={handleReservation}
-            disabled={selectedSeats.length === 0}
-          >
-            Reserve Now
-          </Button>
+          
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            {selectedSeat && !reservedSeat && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    disabled={(day) => !nextEightWeekdays.some(d => d.toDateString() === day.toDateString())}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+
+            {reservedSeat ? (
+              <Button
+                size="lg"
+                className="w-full text-lg py-7"
+                onClick={handleCancelReservation}
+                variant="destructive"
+              >
+                Cancel Reservation
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                className="w-full text-lg py-7"
+                onClick={handleReservation}
+                disabled={!selectedSeat || !selectedDate}
+              >
+                Reserve Now
+              </Button>
+            )}
+          </div>
         </CardFooter>
       </Card>
     </main>
