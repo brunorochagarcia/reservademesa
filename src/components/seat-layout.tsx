@@ -20,28 +20,23 @@ export function SeatLayout({ seats, onSeatClick }: SeatLayoutProps) {
 
   return (
     <div className="flex flex-col items-center gap-4 py-4">
-      <div className="flex justify-center gap-2">
-        {/* Left side, reversed to simulate seats facing left (back-to-back) */}
-        <div className="flex flex-col gap-4">
-          {rows.map((row, rowIndex) => (
-            <div key={`left-${rowIndex}`} className="flex flex-row-reverse gap-1.5 sm:gap-2">
+      <div className="flex flex-col items-center gap-y-8">
+        {rows.map((row, rowIndex) => (
+          <div key={`row-group-${rowIndex}`} className="flex flex-col items-center gap-y-1.5 sm:gap-y-2">
+            {/* Top part of the row */}
+            <div className="flex gap-x-1.5 sm:gap-x-2">
               {row.slice(0, 3).map(seatId => (
                 <Seat key={seatId} seat={findSeat(seatId, seats)} onSeatClick={onSeatClick} />
               ))}
             </div>
-          ))}
-        </div>
-        
-        {/* Right side, normal order */}
-        <div className="flex flex-col gap-4">
-          {rows.map((row, rowIndex) => (
-            <div key={`right-${rowIndex}`} className="flex gap-1.5 sm:gap-2">
+            {/* Bottom part of the row */}
+            <div className="flex gap-x-1.5 sm:gap-x-2">
               {row.slice(3, 6).map(seatId => (
                 <Seat key={seatId} seat={findSeat(seatId, seats)} onSeatClick={onSeatClick} />
               ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
       
       {/* Last Row */}
