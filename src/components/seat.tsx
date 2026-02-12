@@ -7,9 +7,10 @@ import type { Seat as SeatType } from "@/lib/data";
 interface SeatProps {
   seat: SeatType;
   onSeatClick: (id: string) => void;
+  labelPosition?: 'top' | 'bottom';
 }
 
-export function Seat({ seat, onSeatClick }: SeatProps) {
+export function Seat({ seat, onSeatClick, labelPosition = 'top' }: SeatProps) {
   const { id, status } = seat;
 
   const handleClick = () => {
@@ -19,7 +20,10 @@ export function Seat({ seat, onSeatClick }: SeatProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className={cn(
+      "flex flex-col items-center gap-1",
+      labelPosition === 'bottom' && "flex-col-reverse"
+    )}>
       <span className="text-xs font-medium text-muted-foreground">{id}</span>
       <button
         type="button"
