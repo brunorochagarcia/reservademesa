@@ -19,7 +19,7 @@ export const initialSeats: Seat[] = seatIds.map(id => ({
 }));
 
 // Manually make some seats unavailable for demonstration
-const unavailableSeats = ['1D', '2C', '3F', '4B'];
+const unavailableSeats = ['1D', '2C', '3F', '4B', '2F'];
 unavailableSeats.forEach(seatId => {
   const seat = initialSeats.find(s => s.id === seatId);
   if (seat) {
