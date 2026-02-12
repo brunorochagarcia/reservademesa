@@ -12,8 +12,8 @@ export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen w-full gap-8 p-4 sm:p-6 md:p-8">
-      <aside className="flex items-start lg:items-center justify-center">
+    <div className="flex flex-row min-h-screen w-full gap-8 p-4 sm:p-6 md:p-8">
+      <aside className="flex items-center justify-center">
         <Card className="shadow-lg">
           <Calendar
             mode="single"
