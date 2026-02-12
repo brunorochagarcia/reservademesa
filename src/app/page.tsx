@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { format, startOfToday, addDays } from "date-fns";
+import { format, startOfToday, addDays, isWeekend } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { initialSeats } from "@/lib/data";
@@ -16,9 +16,26 @@ export default function Home() {
   const [seats, setSeats] = useState<SeatType[]>(initialSeats);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [viewingDate, setViewingDate] = useState<Date>(startOfToday());
+  const [isViewerCalendarOpen, setIsViewerCalendarOpen] = useState(false);
 
   const selectedSeat = useMemo(() => seats.find(s => s.status === 'selected'), [seats]);
   const reservedSeat = useMemo(() => seats.find(s => s.status === 'unavailable' && s.id !== '2F'), [seats]);
+
+  const displayedSeats = useMemo(() => {
+    return seats.map(s => {
+      // If it's the reserved seat, and we're looking at a different day, show it as available.
+      if (s.status === 'unavailable' && s.id !== '2F' && s.reservationDate && format(s.reservationDate, 'yyyy-MM-dd') !== format(viewingDate, 'yyyy-MM-dd')) {
+        return { ...s, status: 'available' };
+      }
+      // If a seat was shown as available for display, but now we're back on its reservation date, show it as unavailable again.
+      if (s.id === reservedSeat?.id && s.status !== 'unavailable' && reservedSeat?.reservationDate && format(reservedSeat.reservationDate, 'yyyy-MM-dd') === format(viewingDate, 'yyyy-MM-dd')) {
+        return { ...s, status: 'unavailable' };
+      }
+      return s;
+    });
+  }, [seats, viewingDate, reservedSeat]);
+
 
   const handleSeatClick = (id: string) => {
     if (reservedSeat) return; // Cannot change selection if a seat is already reserved
@@ -98,6 +115,10 @@ export default function Home() {
   
   const today = startOfToday();
   const maxDate = addDays(today, 7);
+  
+  const isDayDisabled = (day: Date) => {
+    return day < today || day > maxDate || isWeekend(day);
+  }
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 md:p-8">
@@ -107,8 +128,31 @@ export default function Home() {
           <CardDescription className="text-lg">Select your seat for the trip</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6 flex flex-col items-center gap-2">
+            <p className="text-muted-foreground">Viewing reservations for:</p>
+            <Popover open={isViewerCalendarOpen} onOpenChange={setIsViewerCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-[280px] justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {viewingDate ? format(viewingDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={viewingDate}
+                  onSelect={(date) => {
+                    if (date) setViewingDate(date);
+                    setIsViewerCalendarOpen(false);
+                  }}
+                  disabled={isDayDisabled}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
           <div className="bg-muted/30 rounded-lg p-2 sm:p-4">
-            <SeatLayout seats={seats} onSeatClick={handleSeatClick} />
+            <SeatLayout seats={displayedSeats} onSeatClick={handleSeatClick} />
           </div>
           
           <Legend />
@@ -152,7 +196,7 @@ export default function Home() {
                       setSelectedDate(date);
                       setIsCalendarOpen(false);
                     }}
-                    disabled={(day) => day < today || day > maxDate}
+                    disabled={isDayDisabled}
                     initialFocus
                   />
                 </PopoverContent>

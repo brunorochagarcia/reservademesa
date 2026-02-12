@@ -6,9 +6,11 @@ Welcome to Seatly, a simple and elegant seat reservation application. This proje
 
 - **Interactive Seat Map**: A visual layout of seats that users can click to select.
 - **Seat Statuses**: Seats are clearly marked as available, selected, or unavailable.
-- **Calendar Date Picker**: Appears when a seat is selected, allowing users to choose a reservation date within the next 8 days.
+- **Calendar Date Picker**: Appears when a seat is selected, allowing users to choose a reservation date within the next 8 days, excluding weekends.
 - **Reservation System**: Users can confirm their reservation, which updates the seat to "unavailable" and then provides an option to cancel.
+- **View Reservations**: Look at reservations for other days up until 8 days up front, always locking out the weekends.
 - **Customizable Icons**: Different icons can be used to represent different types of seats.
+- **Git Ready**: Includes a `.gitignore` file to streamline version control.
 
 ## Tech Stack
 
