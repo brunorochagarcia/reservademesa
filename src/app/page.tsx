@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { initialSeats } from "@/lib/data";
 import type { Seat as SeatType } from "@/lib/data";
@@ -20,6 +21,10 @@ export default function Home() {
             selected={date}
             onSelect={setDate}
             className="rounded-md"
+            hideHead
+            formatters={{
+              formatCaption: (date) => format(date, "MMMM"),
+            }}
           />
         </Card>
       </aside>
