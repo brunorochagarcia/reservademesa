@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { format, startOfToday, isSaturday, isSunday, addDays } from "date-fns";
+import { format, startOfToday, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { initialSeats } from "@/lib/data";
@@ -96,17 +96,8 @@ export default function Home() {
     </div>
   );
   
-  const nextEightWeekdays = useMemo(() => {
-    const dates: Date[] = [];
-    let currentDate = startOfToday();
-    while (dates.length < 8) {
-      if (!isSaturday(currentDate) && !isSunday(currentDate)) {
-        dates.push(currentDate);
-      }
-      currentDate = addDays(currentDate, 1);
-    }
-    return dates;
-  }, []);
+  const today = startOfToday();
+  const maxDate = addDays(today, 7);
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 md:p-8">
@@ -161,7 +152,7 @@ export default function Home() {
                       setSelectedDate(date);
                       setIsCalendarOpen(false);
                     }}
-                    disabled={(day) => !nextEightWeekdays.some(d => d.toDateString() === day.toDateString())}
+                    disabled={(day) => day < today || day > maxDate}
                     initialFocus
                   />
                 </PopoverContent>
