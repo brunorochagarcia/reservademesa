@@ -14,15 +14,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-center min-h-screen w-full gap-8 p-4">
-      <main className="flex-1 flex items-center justify-center w-full">
-        <Card className="w-full max-w-sm shadow-lg">
-          <CardContent className="p-2">
-            <div className="bg-muted/30 rounded-lg p-2">
-              <SeatLayout seats={seats} />
-            </div>
-          </CardContent>
-        </Card>
-      </main>
       <aside>
         <Card className="shadow-lg">
           <Calendar
@@ -36,6 +27,15 @@ export default function Home() {
           />
         </Card>
       </aside>
+      <main className="flex-1 flex items-center justify-center w-full">
+        <Card className="w-full max-w-xs shadow-lg">
+          <CardContent className="p-2">
+            <div className="bg-muted/30 rounded-lg p-2">
+              <SeatLayout seats={seats} />
+            </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
