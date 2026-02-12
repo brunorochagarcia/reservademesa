@@ -1,0 +1,27 @@
+export type SeatStatus = 'available' | 'selected' | 'unavailable';
+
+export interface Seat {
+  id: string;
+  status: SeatStatus;
+}
+
+const seatIds = [
+  '1A', '1B', '1C', '1D', '1E', '1F',
+  '2A', '2B', '2C', '2D', '2E', '2F',
+  '3A', '3B', '3C', '3D', '3E', '3F',
+  '4A', '4B', '4C',
+];
+
+export const initialSeats: Seat[] = seatIds.map(id => ({
+  id,
+  status: 'available'
+}));
+
+// Manually make some seats unavailable for demonstration
+const unavailableSeats = ['1D', '2C', '3F', '4B'];
+unavailableSeats.forEach(seatId => {
+  const seat = initialSeats.find(s => s.id === seatId);
+  if (seat) {
+    seat.status = 'unavailable';
+  }
+});
