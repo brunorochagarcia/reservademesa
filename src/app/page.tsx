@@ -9,8 +9,6 @@ import { SeatLayout } from "@/components/seat-layout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
-const SEAT_PRICE = 25;
-
 export default function Home() {
   const [seats, setSeats] = useState<SeatType[]>(initialSeats);
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
@@ -32,7 +30,6 @@ export default function Home() {
   };
 
   const selectedSeats = useMemo(() => seats.filter(s => s.status === 'selected'), [seats]);
-  const totalCost = selectedSeats.length * SEAT_PRICE;
 
   const handleReservation = () => {
     if (selectedSeats.length === 0) return;
@@ -90,7 +87,6 @@ export default function Home() {
         <CardFooter className="flex-col sm:flex-row gap-4 pt-6 bg-muted/50 dark:bg-muted/20 rounded-b-lg p-6">
           <div className="flex-1 text-center sm:text-left">
             <p className="text-lg font-semibold">{selectedSeats.length} {selectedSeats.length === 1 ? 'Seat' : 'Seats'} Selected</p>
-            <p className="text-2xl font-bold text-primary">Total: ${totalCost.toFixed(2)}</p>
           </div>
           <Button 
             size="lg" 
