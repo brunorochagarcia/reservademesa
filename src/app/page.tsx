@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { format, isBefore, startOfToday, isSaturday, isSunday, addDays } from "date-fns";
+import { format, startOfToday, isSaturday, isSunday, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { initialSeats } from "@/lib/data";
@@ -15,6 +15,7 @@ import { CheckCircle2, CalendarIcon } from "lucide-react";
 export default function Home() {
   const [seats, setSeats] = useState<SeatType[]>(initialSeats);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const selectedSeat = useMemo(() => seats.find(s => s.status === 'selected'), [seats]);
   const reservedSeat = useMemo(() => seats.find(s => s.status === 'unavailable' && s.id !== '2F'), [seats]);
@@ -32,10 +33,13 @@ export default function Home() {
       setSelectedDate(undefined); // Reset date on any seat click action
 
       if (isAlreadySelected) {
+          setIsCalendarOpen(false);
           return currentSeats.map((s) =>
               s.id === id ? { ...s, status: 'available' } : s
           );
       }
+      
+      setIsCalendarOpen(true);
 
       return currentSeats.map((s) => {
           if (s.id === id) {
@@ -60,6 +64,7 @@ export default function Home() {
       )
     );
     setSelectedDate(undefined);
+    setIsCalendarOpen(false);
   };
 
   const handleCancelReservation = () => {
@@ -141,7 +146,7 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             {selectedSeat && !reservedSeat && (
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -152,7 +157,10 @@ export default function Home() {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={setSelectedDate}
+                    onSelect={(date) => {
+                      setSelectedDate(date);
+                      setIsCalendarOpen(false);
+                    }}
                     disabled={(day) => !nextEightWeekdays.some(d => d.toDateString() === day.toDateString())}
                     initialFocus
                   />
