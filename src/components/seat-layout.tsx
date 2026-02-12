@@ -17,6 +17,7 @@ export function SeatLayout({ seats, onSeatClick }: SeatLayoutProps) {
     ['3A', '3B', '3C', '3D', '3E', '3F'],
   ];
   const lastRow = ['4A', '4B', '4C'];
+  const separateRow = ['5A', '5B', '5C', '5D'];
 
   return (
     <div className="flex flex-col items-center gap-4 py-4">
@@ -42,6 +43,13 @@ export function SeatLayout({ seats, onSeatClick }: SeatLayoutProps) {
       {/* Last Row */}
       <div className="flex items-center justify-center gap-1.5 sm:gap-2 pt-6">
         {lastRow.map(seatId => (
+          <Seat key={seatId} seat={findSeat(seatId, seats)} onSeatClick={onSeatClick} labelPosition="top" />
+        ))}
+      </div>
+      
+      {/* Separate Row */}
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 pt-6">
+        {separateRow.map(seatId => (
           <Seat key={seatId} seat={findSeat(seatId, seats)} onSeatClick={onSeatClick} labelPosition="top" />
         ))}
       </div>
