@@ -20,11 +20,11 @@ export function SeatLayout({ seats, onSeatClick }: SeatLayoutProps) {
 
   return (
     <div className="flex flex-col items-center gap-4 py-4">
-      <div className="flex justify-center gap-4">
-        {/* Combined first 3 rows - Left side */}
+      <div className="flex justify-center gap-2">
+        {/* Left side, reversed to simulate seats facing left (back-to-back) */}
         <div className="flex flex-col gap-4">
           {rows.map((row, rowIndex) => (
-            <div key={`left-${rowIndex}`} className="flex gap-1.5 sm:gap-2">
+            <div key={`left-${rowIndex}`} className="flex flex-row-reverse gap-1.5 sm:gap-2">
               {row.slice(0, 3).map(seatId => (
                 <Seat key={seatId} seat={findSeat(seatId, seats)} onSeatClick={onSeatClick} />
               ))}
@@ -32,7 +32,7 @@ export function SeatLayout({ seats, onSeatClick }: SeatLayoutProps) {
           ))}
         </div>
         
-        {/* Combined first 3 rows - Right side (back to back) */}
+        {/* Right side, normal order */}
         <div className="flex flex-col gap-4">
           {rows.map((row, rowIndex) => (
             <div key={`right-${rowIndex}`} className="flex gap-1.5 sm:gap-2">
