@@ -20,13 +20,14 @@ export function Seat({ seat, onSeatClick }: SeatProps) {
 
   return (
     <div className="flex flex-col items-center gap-1">
+      <span className="text-xs font-medium text-muted-foreground">{id}</span>
       <button
         type="button"
         aria-label={`Seat ${id}, Status: ${status}`}
         onClick={handleClick}
         disabled={status === 'unavailable'}
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-lg border-2 p-1 transition-all duration-200 ease-in-out transform focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background",
+          "flex h-10 w-10 items-center justify-center rounded-lg border-2 p-1 transition-all duration-200 ease-in-out transform focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           {
             "border-accent/50 bg-transparent text-accent/80 hover:border-accent hover:bg-accent/10 hover:text-accent cursor-pointer": status === "available",
             "border-accent bg-accent text-accent-foreground cursor-pointer shadow-lg shadow-accent/30": status === "selected",
@@ -36,7 +37,6 @@ export function Seat({ seat, onSeatClick }: SeatProps) {
       >
         <Armchair className="h-6 w-6" />
       </button>
-      <span className="text-xs font-medium text-muted-foreground">{id}</span>
     </div>
   );
 }
