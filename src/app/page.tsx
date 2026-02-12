@@ -12,8 +12,8 @@ export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
-    <div className="flex flex-row min-h-screen w-full gap-8 p-4 sm:p-6 md:p-8">
-      <aside className="flex items-center justify-center">
+    <div className="flex flex-col lg:flex-row items-center justify-center min-h-screen w-full gap-8 p-4 sm:p-6 md:p-8">
+      <aside>
         <Card className="shadow-lg">
           <Calendar
             mode="single"
@@ -23,7 +23,7 @@ export default function Home() {
           />
         </Card>
       </aside>
-      <main className="flex-1 flex items-center justify-center">
+      <main className="flex-1 flex items-center justify-center w-full">
         <Card className="w-full max-w-3xl shadow-lg">
           <CardContent className="p-6">
             <div className="bg-muted/30 rounded-lg p-2 sm:p-4">
