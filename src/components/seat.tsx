@@ -1,6 +1,6 @@
 "use client";
 
-import { Armchair } from "lucide-react";
+import { Armchair, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Seat as SeatType } from "@/lib/data";
 
@@ -39,7 +39,7 @@ export function Seat({ seat, onSeatClick, labelPosition = 'top' }: SeatProps) {
           }
         )}
       >
-        <Armchair className="h-6 w-6" />
+        {id === '4B' ? <Armchair className="h-6 w-6" /> : <Monitor className="h-6 w-6" />}
       </button>
     </div>
   );
