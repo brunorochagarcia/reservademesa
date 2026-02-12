@@ -21,7 +21,6 @@ export default function Home() {
             selected={date}
             onSelect={setDate}
             className="rounded-md"
-            hideHead
             formatters={{
               formatCaption: (date) => format(date, "MMMM"),
             }}
