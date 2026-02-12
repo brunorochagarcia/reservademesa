@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, Monitor, Armchair, User, Star, Crown, Accessibility } from "lucide-react";
+import { Monitor, Armchair, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Seat as SeatType } from "@/lib/data";
 
@@ -21,18 +21,13 @@ export function Seat({ seat, onSeatClick, labelPosition = 'top' }: SeatProps) {
 
   const Icon = () => {
     switch (id) {
-      case '4A':
-        return <Armchair className="h-6 w-6" />;
       case '4B':
-        return <Briefcase className="h-6 w-6" />;
-      case '4C':
         return <User className="h-6 w-6" />;
       case '5A':
-        return <Star className="h-6 w-6" />;
       case '5B':
-        return <Crown className="h-6 w-6" />;
       case '5C':
-        return <Accessibility className="h-6 w-6" />;
+      case '5D':
+        return <Armchair className="h-6 w-6" />;
       default:
         return <Monitor className="h-6 w-6" />;
     }
