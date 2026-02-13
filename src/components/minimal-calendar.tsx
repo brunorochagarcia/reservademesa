@@ -25,7 +25,8 @@ function MinimalCalendar({
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-base font-medium",
         nav: "hidden",
-        head: "hidden",
+        head_row: "flex",
+        head_cell: "text-muted-foreground rounded-md w-8 font-normal text-xs",
         row: "flex w-full mt-1",
         cell: "h-8 w-8 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
         day: cn(
@@ -41,6 +42,7 @@ function MinimalCalendar({
       }}
       formatters={{
         formatCaption: (date) => format(date, 'MMMM'),
+        formatShortWeekday: (day) => day.toLocaleDateString('en-US', { weekday: 'narrow' })
       }}
       {...props}
     />
