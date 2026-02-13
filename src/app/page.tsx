@@ -110,7 +110,7 @@ export default function Home() {
                   selected={reservationDate}
                   onSelect={handleDateSelect}
                   fromDate={today}
-                  toDate={addDays(today, 7)}
+                  toDate={addDays(today, 8)}
                   disabled={isWeekend}
                 />
                 <Button
