@@ -7,9 +7,10 @@ import type { Seat as SeatType } from "@/lib/data";
 interface SeatProps {
   seat: SeatType;
   labelPosition?: 'top' | 'bottom';
+  onSeatClick: (seat: SeatType) => void;
 }
 
-export function Seat({ seat, labelPosition = 'top' }: SeatProps) {
+export function Seat({ seat, labelPosition = 'top', onSeatClick }: SeatProps) {
   const { id, status } = seat;
 
   const Icon = () => {
@@ -31,6 +32,8 @@ export function Seat({ seat, labelPosition = 'top' }: SeatProps) {
         return <Monitor className="h-6 w-6" />;
     }
   };
+  
+  const isClickable = status !== 'unavailable';
 
   return (
     <div className={cn(
@@ -39,13 +42,16 @@ export function Seat({ seat, labelPosition = 'top' }: SeatProps) {
     )}>
       <span className="text-xs font-medium text-muted-foreground">{id}</span>
       <div
+        onClick={() => isClickable && onSeatClick(seat)}
         aria-label={`Seat ${id}, Status: ${status}`}
         className={cn(
           "flex h-10 w-10 items-center justify-center rounded-lg border-2 p-1 transition-all duration-200 ease-in-out transform",
           {
-            "border-accent/50 bg-transparent text-accent/80": status === "available",
+            "border-accent/50 bg-transparent text-accent/80 hover:border-accent hover:bg-accent/10": status === "available",
             "border-accent bg-accent text-accent-foreground shadow-lg shadow-accent/30": status === "selected",
             "border-muted-foreground/20 bg-muted/50 text-muted-foreground/30": status === "unavailable",
+            "cursor-pointer": isClickable,
+            "cursor-not-allowed": !isClickable,
           }
         )}
       >

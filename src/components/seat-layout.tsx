@@ -3,13 +3,14 @@ import { Seat } from "./seat";
 
 interface SeatLayoutProps {
   seats: SeatType[];
+  onSeatClick: (seat: SeatType) => void;
 }
 
 const findSeat = (id: string, seats: SeatType[]) => {
     return seats.find(seat => seat.id === id)!;
 }
 
-export function SeatLayout({ seats }: SeatLayoutProps) {
+export function SeatLayout({ seats, onSeatClick }: SeatLayoutProps) {
   const rows = [
     ['1A', '1B', '1C', '1D', '1E', '1F'],
     ['2A', '2B', '2C', '2D', '2E', '2F'],
@@ -26,13 +27,13 @@ export function SeatLayout({ seats }: SeatLayoutProps) {
             {/* Top part of the row */}
             <div className="flex gap-x-1.5">
               {row.slice(0, 3).map(seatId => (
-                <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="top" />
+                <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="top" onSeatClick={onSeatClick} />
               ))}
             </div>
             {/* Bottom part of the row */}
             <div className="flex gap-x-1.5">
               {row.slice(3, 6).map(seatId => (
-                <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="bottom" />
+                <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="bottom" onSeatClick={onSeatClick} />
               ))}
             </div>
           </div>
@@ -42,14 +43,14 @@ export function SeatLayout({ seats }: SeatLayoutProps) {
       {/* Last Row */}
       <div className="flex items-center justify-center gap-1.5 pt-3">
         {lastRow.map(seatId => (
-          <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="top" />
+          <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="top" onSeatClick={onSeatClick} />
         ))}
       </div>
       
       {/* Separate Row */}
       <div className="flex items-center justify-center gap-1.5 pt-3">
         {separateRow.map(seatId => (
-          <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="top" />
+          <Seat key={seatId} seat={findSeat(seatId, seats)} labelPosition="top" onSeatClick={onSeatClick} />
         ))}
       </div>
     </div>
