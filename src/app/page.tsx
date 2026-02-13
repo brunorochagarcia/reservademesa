@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { format, addDays, isWeekend } from "date-fns";
+import { useState, useMemo } from "react";
+import { format, addDays, subDays, isWeekend, isSameDay, isAfter, isBefore, startOfDay } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { initialSeats } from "@/lib/data";
@@ -9,13 +9,24 @@ import type { Seat as SeatType } from "@/lib/data";
 import { SeatLayout } from "@/components/seat-layout";
 import { MinimalCalendar } from "@/components/minimal-calendar";
 import { useToast } from "@/hooks/use-toast";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
+interface Reservation {
+  seatId: string;
+  date: Date;
+}
 
 export default function Home() {
-  const [seats, setSeats] = useState<SeatType[]>(initialSeats);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedSeat, setSelectedSeat] = useState<SeatType | null>(null);
   const [reservationDate, setReservationDate] = useState<Date | undefined>();
   const { toast } = useToast();
-  const today = new Date();
+  
+  const today = startOfDay(new Date());
+  const [viewDate, setViewDate] = useState<Date>(today);
+
 
   const handleSeatClick = (seatToSelect: SeatType) => {
     if (seatToSelect.status === "unavailable") {
@@ -25,21 +36,9 @@ export default function Home() {
     if (selectedSeat && selectedSeat.id === seatToSelect.id) {
       setSelectedSeat(null);
       setReservationDate(undefined);
-      setSeats(
-        seats.map((s) =>
-          s.id === seatToSelect.id ? { ...s, status: "available" } : s
-        )
-      );
     } else {
       setSelectedSeat(seatToSelect);
       setReservationDate(undefined);
-      setSeats(
-        seats.map((s) => {
-          if (s.id === seatToSelect.id) return { ...s, status: "selected" };
-          if (s.status === "selected") return { ...s, status: "available" };
-          return s;
-        })
-      );
     }
   };
 
@@ -59,13 +58,10 @@ export default function Home() {
       return;
     }
 
-    setSeats(
-      seats.map((seat) =>
-        seat.id === selectedSeat.id
-          ? { ...seat, status: "unavailable", reservationDate }
-          : seat
-      )
-    );
+    setReservations([
+      ...reservations,
+      { seatId: selectedSeat.id, date: reservationDate },
+    ]);
 
     toast({
       title: "Reservation Confirmed!",
@@ -78,20 +74,76 @@ export default function Home() {
     setSelectedSeat(null);
     setReservationDate(undefined);
   };
+  
+  const seatsForDisplay = useMemo(() => {
+    return initialSeats.map((seat) => {
+      if (seat.status === "unavailable") {
+        return seat;
+      }
+
+      const isReserved = reservations.some(
+        (res) => res.seatId === seat.id && isSameDay(res.date, viewDate)
+      );
+      if (isReserved) {
+        return { ...seat, status: "unavailable" };
+      }
+
+      if (selectedSeat?.id === seat.id) {
+        return { ...seat, status: "selected" };
+      }
+
+      return { ...seat, status: "available" };
+    });
+  }, [reservations, viewDate, selectedSeat]);
+
+  const handlePrevDay = () => {
+    if (isSameDay(viewDate, today)) return;
+    setViewDate((prev) => subDays(prev, 1));
+  };
+
+  const handleNextDay = () => {
+    setViewDate((prev) => addDays(prev, 1));
+  };
+
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen w-full p-4 gap-8">
       <header className="text-center">
         <h1 className="text-5xl font-bold tracking-tight text-primary">Seatly</h1>
-        <p className="text-lg text-muted-foreground mt-2">
-          {format(today, "EEEE, MMMM do")}
-        </p>
+        <div className="flex items-center justify-center gap-2 mt-2">
+            <Button variant="ghost" size="icon" onClick={handlePrevDay} disabled={isSameDay(viewDate, today)}>
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button variant="ghost" className="text-lg text-muted-foreground p-1 h-auto font-normal">
+                        {format(viewDate, "EEEE, MMMM do")}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                    <Calendar
+                        mode="single"
+                        selected={viewDate}
+                        onSelect={(date) => {
+                          if (date && !isBefore(date, today)) {
+                            setViewDate(date);
+                          }
+                        }}
+                        disabled={(date) => isBefore(date, today)}
+                        initialFocus
+                    />
+                </PopoverContent>
+            </Popover>
+            <Button variant="ghost" size="icon" onClick={handleNextDay}>
+                <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
       </header>
       <main className="flex flex-row items-start gap-8">
         <Card className="shadow-lg">
           <CardContent className="p-4 flex justify-center">
             <div className="bg-muted/30 rounded-lg p-2">
-              <SeatLayout seats={seats} onSeatClick={handleSeatClick} />
+              <SeatLayout seats={seatsForDisplay} onSeatClick={handleSeatClick} />
             </div>
           </CardContent>
         </Card>

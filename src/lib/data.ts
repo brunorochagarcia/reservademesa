@@ -3,7 +3,6 @@ export type SeatStatus = 'available' | 'selected' | 'unavailable';
 export interface Seat {
   id: string;
   status: SeatStatus;
-  reservationDate?: Date;
 }
 
 const seatIds = [
