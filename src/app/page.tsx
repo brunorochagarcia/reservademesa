@@ -23,9 +23,19 @@ export default function Home() {
   const [selectedSeat, setSelectedSeat] = useState<SeatType | null>(null);
   const [reservationDate, setReservationDate] = useState<Date | undefined>();
   const { toast } = useToast();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
-  const today = startOfDay(new Date());
-  const [viewDate, setViewDate] = useState<Date>(today);
+  const today = useMemo(() => startOfDay(new Date()), []);
+
+  const firstAvailableDate = useMemo(() => {
+    let date = today;
+    while (isWeekend(date)) {
+      date = addDays(date, 1);
+    }
+    return date;
+  }, [today]);
+  
+  const [viewDate, setViewDate] = useState<Date>(firstAvailableDate);
 
 
   const handleSeatClick = (seatToSelect: SeatType) => {
@@ -97,12 +107,21 @@ export default function Home() {
   }, [reservations, viewDate, selectedSeat]);
 
   const handlePrevDay = () => {
-    if (isSameDay(viewDate, today)) return;
-    setViewDate((prev) => subDays(prev, 1));
+    let newDate = subDays(viewDate, 1);
+    while (isWeekend(newDate)) {
+      newDate = subDays(newDate, 1);
+    }
+    if (!isBefore(newDate, firstAvailableDate)) {
+      setViewDate(newDate);
+    }
   };
 
   const handleNextDay = () => {
-    setViewDate((prev) => addDays(prev, 1));
+    let newDate = addDays(viewDate, 1);
+    while (isWeekend(newDate)) {
+      newDate = addDays(newDate, 1);
+    }
+    setViewDate(newDate);
   };
 
 
@@ -111,10 +130,10 @@ export default function Home() {
       <header className="text-center">
         <h1 className="text-5xl font-bold tracking-tight text-primary">Seatly</h1>
         <div className="flex items-center justify-center gap-2 mt-2">
-            <Button variant="ghost" size="icon" onClick={handlePrevDay} disabled={isSameDay(viewDate, today)}>
+            <Button variant="ghost" size="icon" onClick={handlePrevDay} disabled={isSameDay(viewDate, firstAvailableDate)}>
                 <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Popover>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                     <Button variant="ghost" className="text-lg text-muted-foreground p-1 h-auto font-normal">
                         {format(viewDate, "EEEE, MMMM do")}
@@ -125,11 +144,12 @@ export default function Home() {
                         mode="single"
                         selected={viewDate}
                         onSelect={(date) => {
-                          if (date && !isBefore(date, today)) {
+                          if (date) {
                             setViewDate(date);
                           }
+                          setIsCalendarOpen(false);
                         }}
-                        disabled={(date) => isBefore(date, today)}
+                        disabled={(date) => isBefore(date, today) || isWeekend(date)}
                         initialFocus
                     />
                 </PopoverContent>
