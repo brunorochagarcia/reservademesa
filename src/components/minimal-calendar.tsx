@@ -26,12 +26,12 @@ function MinimalCalendar({
         caption_label: "text-base font-medium",
         nav: "hidden",
         head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-8 font-normal text-xs",
+        head_cell: "text-muted-foreground rounded-md w-7 font-normal text-[10px]",
         row: "flex w-full mt-1",
-        cell: "h-8 w-8 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+        cell: "h-7 w-7 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-8 w-8 p-0 font-normal"
+          "h-7 w-7 p-0 font-normal"
         ),
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md",

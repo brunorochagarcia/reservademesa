@@ -22,9 +22,6 @@ export default function Home() {
       <main>
         <Card className="shadow-lg">
           <CardContent className="p-4 flex flex-col md:flex-row gap-8 items-center">
-            <div className="bg-muted/30 rounded-lg p-2">
-              <SeatLayout seats={seats} />
-            </div>
             <div className="flex flex-col items-center">
               <MinimalCalendar
                 selected={selectedDate}
@@ -34,6 +31,9 @@ export default function Home() {
                 disabled={disabledDays}
                 numberOfMonths={1}
               />
+            </div>
+            <div className="bg-muted/30 rounded-lg p-2">
+              <SeatLayout seats={seats} />
             </div>
           </CardContent>
         </Card>
