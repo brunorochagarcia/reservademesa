@@ -36,7 +36,7 @@ function MinimalCalendar({
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md",
         day_today: "bg-accent text-accent-foreground rounded-md",
-        day_disabled: "text-muted-foreground/10 line-through",
+        day_disabled: "text-muted-foreground/50",
         day_hidden: "invisible",
         ...classNames,
       }}
