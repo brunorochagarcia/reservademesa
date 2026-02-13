@@ -13,12 +13,15 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
   const today = new Date();
-  const sevenDaysFromNow = addDays(today, 7);
+  const eightDaysFromNow = addDays(today, 8);
 
   const disabledDays = (date: Date) => isSaturday(date) || isSunday(date);
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full p-4">
+    <div className="flex flex-col items-center justify-start min-h-screen w-full p-4 gap-8">
+      <header>
+        <h1 className="text-5xl font-bold tracking-tight text-primary">Seatly</h1>
+      </header>
       <main>
         <Card className="shadow-lg">
           <CardContent className="p-4 flex flex-col md:flex-row gap-8 items-center">
@@ -27,7 +30,7 @@ export default function Home() {
                 selected={selectedDate}
                 onSelect={setSelectedDate}
                 fromDate={today}
-                toDate={sevenDaysFromNow}
+                toDate={eightDaysFromNow}
                 disabled={disabledDays}
                 numberOfMonths={1}
               />
