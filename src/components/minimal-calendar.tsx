@@ -7,7 +7,7 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
-export type MinimalCalendarProps = Omit<React.ComponentProps<typeof DayPicker>, 'mode' | 'selected' | 'onSelect'>
+export type MinimalCalendarProps = React.ComponentProps<typeof DayPicker>
 
 function MinimalCalendar({
   className,
@@ -16,6 +16,7 @@ function MinimalCalendar({
 }: MinimalCalendarProps) {
   return (
     <DayPicker
+      mode="single"
       showOutsideDays={false}
       className={cn("p-3", className)}
       classNames={{
@@ -31,6 +32,8 @@ function MinimalCalendar({
           buttonVariants({ variant: "ghost" }),
           "h-8 w-8 p-0 font-normal"
         ),
+        day_selected:
+          "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md",
         day_today: "bg-accent text-accent-foreground rounded-md",
         day_disabled: "text-muted-foreground/10 line-through",
         day_hidden: "invisible",
