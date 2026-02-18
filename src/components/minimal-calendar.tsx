@@ -18,31 +18,31 @@ function MinimalCalendar({
     <DayPicker
       mode="single"
       showOutsideDays={false}
+      weekStartsOn={0}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col",
         month: "space-y-2",
-        caption: "flex justify-center pt-1 relative items-center",
+        month_caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-base font-medium",
         nav: "hidden",
-        head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-7 font-normal text-[10px]",
-        row: "flex w-full mt-1",
-        cell: "h-7 w-7 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
-        day: cn(
+        weekdays: "hidden",
+        month_grid: "w-full border-collapse",
+        week: "flex w-full mt-1",
+        day: "h-7 w-7 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+        day_button: cn(
           buttonVariants({ variant: "ghost" }),
           "h-7 w-7 p-0 font-normal"
         ),
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md",
-        day_today: "bg-accent text-accent-foreground rounded-md",
-        day_disabled: "text-muted-foreground/50",
-        day_hidden: "invisible",
+        selected:
+          "bg-primary text-primary-foreground rounded-md [&>button]:hover:bg-primary/90 [&>button]:hover:text-primary-foreground",
+        today: "bg-accent text-accent-foreground rounded-md",
+        disabled: "text-muted-foreground/20",
+        hidden: "invisible",
         ...classNames,
       }}
       formatters={{
-        formatCaption: (date) => format(date, 'MMMM'),
-        formatShortWeekday: (day) => day.toLocaleDateString('en-US', { weekday: 'narrow' })
+        formatMonthCaption: (date) => format(date, 'MMMM'),
       }}
       {...props}
     />

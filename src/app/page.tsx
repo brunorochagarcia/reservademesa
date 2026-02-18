@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, addDays, subDays, isWeekend, isSameDay, isAfter, isBefore, startOfDay } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,11 @@ import type { Seat as SeatType } from "@/lib/data";
 import { SeatLayout } from "@/components/seat-layout";
 import { MinimalCalendar } from "@/components/minimal-calendar";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 
 interface Reservation {
   seatId: string;
@@ -20,6 +22,7 @@ interface Reservation {
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedSeat, setSelectedSeat] = useState<SeatType | null>(null);
   const [reservationDate, setReservationDate] = useState<Date | undefined>();
   const { toast } = useToast();
@@ -37,6 +40,35 @@ export default function Home() {
   
   const [viewDate, setViewDate] = useState<Date>(firstAvailableDate);
 
+  useEffect(() => {
+    const fetchReservations = async () => {
+      setIsLoading(true);
+      try {
+        const dateStr = format(viewDate, "yyyy-MM-dd");
+        const q = query(
+          collection(db, "reservations"),
+          where("date", "==", dateStr)
+        );
+        const snapshot = await getDocs(q);
+        const fetched: Reservation[] = snapshot.docs.map((doc) => ({
+          seatId: doc.data().seatId,
+          date: viewDate,
+        }));
+        setReservations(fetched);
+      } catch (error) {
+        console.error("Failed to fetch reservations:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not load reservations. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, [viewDate, toast]);
 
   const handleSeatClick = (seatToSelect: SeatType) => {
     if (seatToSelect.status === "unavailable") {
@@ -58,7 +90,7 @@ export default function Home() {
     }
   };
 
-  const handleConfirmReservation = () => {
+  const handleConfirmReservation = async () => {
     if (!selectedSeat || !reservationDate) {
       toast({
         variant: "destructive",
@@ -68,21 +100,40 @@ export default function Home() {
       return;
     }
 
-    setReservations([
-      ...reservations,
-      { seatId: selectedSeat.id, date: reservationDate },
-    ]);
+    try {
+      const dateStr = format(reservationDate, "yyyy-MM-dd");
 
-    toast({
-      title: "Reservation Confirmed!",
-      description: `Seat ${selectedSeat.id} reserved for ${format(
-        reservationDate,
-        "PPP"
-      )}.`,
-    });
+      await addDoc(collection(db, "reservations"), {
+        seatId: selectedSeat.id,
+        date: dateStr,
+        createdAt: serverTimestamp(),
+      });
 
-    setSelectedSeat(null);
-    setReservationDate(undefined);
+      if (isSameDay(reservationDate, viewDate)) {
+        setReservations((prev) => [
+          ...prev,
+          { seatId: selectedSeat.id, date: reservationDate },
+        ]);
+      }
+
+      toast({
+        title: "Reservation Confirmed!",
+        description: `Seat ${selectedSeat.id} reserved for ${format(
+          reservationDate,
+          "PPP"
+        )}.`,
+      });
+
+      setSelectedSeat(null);
+      setReservationDate(undefined);
+    } catch (error) {
+      console.error("Failed to save reservation:", error);
+      toast({
+        variant: "destructive",
+        title: "Reservation Failed",
+        description: "Could not save your reservation. Please try again.",
+      });
+    }
   };
   
   const seatsForDisplay = useMemo(() => {
@@ -163,7 +214,13 @@ export default function Home() {
         <Card className="shadow-lg">
           <CardContent className="p-4 flex justify-center">
             <div className="bg-muted/30 rounded-lg p-2">
-              <SeatLayout seats={seatsForDisplay} onSeatClick={handleSeatClick} />
+              {isLoading ? (
+                <div className="flex items-center justify-center h-64 w-64">
+                  <p className="text-muted-foreground">Loading...</p>
+                </div>
+              ) : (
+                <SeatLayout seats={seatsForDisplay} onSeatClick={handleSeatClick} />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -171,7 +228,15 @@ export default function Home() {
         {selectedSeat && (
           <div className="w-80">
             <Card className="shadow-lg">
-              <CardHeader>
+              <CardHeader className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-2 h-6 w-6"
+                  onClick={() => { setSelectedSeat(null); setReservationDate(undefined); }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
                 <CardTitle className="text-center text-2xl">
                   Reserve Seat {selectedSeat.id}
                 </CardTitle>
