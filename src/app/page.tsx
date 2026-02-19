@@ -12,8 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
+import { getReservations, createReservation } from "@/lib/actions";
 
 interface Reservation {
   seatId: string;
@@ -45,13 +44,9 @@ export default function Home() {
       setIsLoading(true);
       try {
         const dateStr = format(viewDate, "yyyy-MM-dd");
-        const q = query(
-          collection(db, "reservations"),
-          where("date", "==", dateStr)
-        );
-        const snapshot = await getDocs(q);
-        const fetched: Reservation[] = snapshot.docs.map((doc) => ({
-          seatId: doc.data().seatId,
+        const rows = await getReservations(dateStr);
+        const fetched: Reservation[] = rows.map((row) => ({
+          seatId: row.seatId,
           date: viewDate,
         }));
         setReservations(fetched);
@@ -103,11 +98,7 @@ export default function Home() {
     try {
       const dateStr = format(reservationDate, "yyyy-MM-dd");
 
-      await addDoc(collection(db, "reservations"), {
-        seatId: selectedSeat.id,
-        date: dateStr,
-        createdAt: serverTimestamp(),
-      });
+      await createReservation(selectedSeat.id, dateStr);
 
       if (isSameDay(reservationDate, viewDate)) {
         setReservations((prev) => [
