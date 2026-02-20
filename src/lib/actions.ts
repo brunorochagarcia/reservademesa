@@ -13,3 +13,16 @@ export async function createReservation(seatId: string, date: string) {
     data: { seatId, date },
   });
 }
+
+export async function updateReservation(id: string, newDate: string) {
+  return prisma.reservation.update({
+    where: { id },
+    data: { date: newDate },
+  });
+}
+
+export async function cancelReservation(id: string) {
+  return prisma.reservation.delete({
+    where: { id },
+  });
+}

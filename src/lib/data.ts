@@ -1,4 +1,4 @@
-export type SeatStatus = 'available' | 'selected' | 'unavailable';
+export type SeatStatus = 'available' | 'selected' | 'unavailable' | 'my-reserved';
 
 export interface Seat {
   id: string;

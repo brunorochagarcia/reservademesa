@@ -6,7 +6,15 @@
       "Bash(./node_modules/.bin/next dev:*)",
       "Bash(node -e:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm install:*)",
+      "Bash(DATABASE_URL=\"postgresql://seatly_user:seatly_password@localhost:5432/seatly\" npx prisma generate:*)",
+      "Bash(DATABASE_URL=\"postgresql://seatly_user:seatly_password@localhost:5432/seatly\" npx prisma db push:*)",
+      "Bash(netstat:*)",
+      "Read(//c/Users/FDTE-DSD/Documents/Bruno/ReservaMesa/**)",
+      "Bash(xargs:*)",
+      "Bash(DATABASE_URL=\"postgresql://seatly_user:seatly_password@localhost:5432/seatly\" npx prisma studio:*)"
     ]
   }
 }

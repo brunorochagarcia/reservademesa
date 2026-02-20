@@ -50,6 +50,7 @@ export function Seat({ seat, labelPosition = 'top', onSeatClick }: SeatProps) {
             "border-accent/50 bg-transparent text-accent/80 hover:border-accent hover:bg-accent/10": status === "available",
             "border-accent bg-accent text-accent-foreground shadow-lg shadow-accent/30": status === "selected",
             "border-muted-foreground/20 bg-muted/50 text-muted-foreground/30": status === "unavailable",
+            "border-primary bg-primary/20 text-primary shadow-md shadow-primary/30 hover:bg-primary/30": status === "my-reserved",
             "cursor-pointer": isClickable,
             "cursor-not-allowed": !isClickable,
           }

@@ -37,7 +37,7 @@ function MinimalCalendar({
         selected:
           "bg-primary text-primary-foreground rounded-md [&>button]:hover:bg-primary/90 [&>button]:hover:text-primary-foreground",
         today: "bg-accent text-accent-foreground rounded-md",
-        disabled: "text-muted-foreground/15 [&>button]:text-muted-foreground/15 [&>button]:hover:bg-transparent",
+        disabled: "opacity-20 [&>button]:hover:bg-transparent [&>button]:pointer-events-none",
         hidden: "invisible",
         ...classNames,
       }}
